@@ -160,13 +160,13 @@ static PKArgs args_to_dict(
 oobj Frame::to_dict(const PKArgs&) {
   py::otuple names = dt->get_pynames();
   py::odict res;
+  py::olist pycol(dt->nrows());
   for (size_t j = 0; j < dt->ncols(); ++j) {
-    py::olist pycol(dt->nrows());
     const Column& col = dt->get_column(j);
     for (size_t i = 0; i < dt->nrows(); ++i) {
-      pycol.set(i, col.get_element_as_pyobject(i));
+      pycol.set(i,std::move(col.get_element_as_pyobject(i)));
     }
-    res.set(names[j], pycol);
+    res.set(names[j],std::move(pycol));
   }
   return std::move(res);
 }
